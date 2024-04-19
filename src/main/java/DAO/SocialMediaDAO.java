@@ -126,13 +126,35 @@ public class SocialMediaDAO {
     public Message updateMessage(int id, Message msg){
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "update message set   where message_id = ?";
+            String sql = "update message set posted_by = ?, message_text = ? , time_posted_epoch = ?  where message_id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, msg.getPosted_by());
+            preparedStatement.setString(2, msg.getMessage_text());
+            preparedStatement.setLong(3,msg.getTime_posted_epoch());
             preparedStatement.execute();
         } catch(SQLException e){
             System.out.println(e.getMessage());
         }
         return msg;
     }
+
+    public List<Message> getMessagesById(int id){
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> messages = new ArrayList<>();
+        try {
+            String sql = "select * from messages where message_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Message msg = new Message(rs.getInt("message_id"), rs.getInt("posted_by"),
+                rs.getString("message_text"),rs.getLong("time_posted_epoch"));
+                messages.add(msg);
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return messages;
+    }
+
+    
 }
