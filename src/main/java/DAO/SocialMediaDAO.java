@@ -66,7 +66,7 @@ public class SocialMediaDAO {
         return null;
     }
 
-    public List<Message> getAllFlights(){
+    public List<Message> getAllMessages(){
         Connection connection = ConnectionUtil.getConnection();
         List<Message> messages = new ArrayList<>();
         try {
@@ -91,7 +91,7 @@ public class SocialMediaDAO {
         Connection connection = ConnectionUtil.getConnection();
         try {
             //Write SQL logic here
-            String sql = "select * from message where message_id = ?";
+            String sql = "select * from message where posted_by = ?";
             
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
@@ -138,11 +138,11 @@ public class SocialMediaDAO {
         return msg;
     }
 
-    public List<Message> getMessagesById(int id){
+    public List<Message> getMessagesByUser(int id){
         Connection connection = ConnectionUtil.getConnection();
         List<Message> messages = new ArrayList<>();
         try {
-            String sql = "select * from messages where message_id = ?";
+            String sql = "select * from messages where posted_by = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet rs = preparedStatement.executeQuery();
             while(rs.next()){
