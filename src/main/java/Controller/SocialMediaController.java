@@ -25,6 +25,24 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register",this::addNewUser);
         app.post("/login",this::logger);
+
+        app.get("/messages/{message_id}",
+        );
+
+        app.delete("/messages/{message_id}",
+        );
+
+        app.delete("/messages/{message_id}", ctx->{
+            int id = Integer.parseInt(ctx.pathParam("message_id"));
+            Message message = socialMediaService.deleteMessage(id);
+            ctx.json(message);
+            ctx.status(200);}
+        );
+
+
+        
+        
+        
         app.start(8080);
 
         return app;
@@ -34,7 +52,7 @@ public class SocialMediaController {
      * This is an example handler for an example endpoint.
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void addNewUser(Context ctx) {
+    private void addNewUser(Context ctx)  throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
         List <Account> accounts = socialMediaService.getAllAccounts();
@@ -45,11 +63,12 @@ public class SocialMediaController {
         }
         if(account.getUsername().length()>0 && account.getPassword().length()>4){
             Account addedAccount = socialMediaService.addUser(account);
+            ctx.json(addedAccount, Account.class);
             ctx.status(200);
         }
         ctx.status(400);
     }
-    private void logger(Context ctx){
+    private void logger(Context ctx)  throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
         List <Account> accounts = socialMediaService.getAllAccounts();
@@ -63,7 +82,7 @@ public class SocialMediaController {
 
     }
 
-    private void messageHandler(Context ctx){
+    private void messageGenerator(Context ctx)  throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Message msg = mapper.readValue(ctx.body(), Message.class);
         String txt = msg.getMessage_text();
@@ -78,7 +97,7 @@ public class SocialMediaController {
 
     }
 
-    private void messageFeed(Context ctx){
+    private void messageFeed(Context ctx) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         List<Message> messages = socialMediaService.getAllMessages();
         ctx.json(messages);
@@ -87,31 +106,35 @@ public class SocialMediaController {
     }
 
     private void messageRetrieve(Context ctx){
-        ObjectMapper mapper = new ObjectMapper();
-        List<Message> messages = socialMediaService.getAllMessages();
-        ctx.json(messages);
-        ctx.status(200);
-
+        int id =Integer.parseInt(ctx.pathParam("message_id"));
+            Message message = socialMediaService.getMessage(id);
+            ctx.json(message);
+            ctx.status(200);
     }
+    
     private void messageDelete(Context ctx){
-        ObjectMapper mapper = new ObjectMapper();
-        List<Message> messages = socialMediaService.getAllMessages();
-        ctx.json(messages);
-        ctx.status(200);
-
+        int id = Integer.parseInt(ctx.pathParam("message_id"));
+            Message message = socialMediaService.deleteMessage(id);
+            ctx.json(message);
+            ctx.status(200);
     }
 
-    private void messageUpdate(Context ctx){
+    private void messageUpdate(Context ctx) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
-        List<Message> messages = socialMediaService.getAllMessages();
-        ctx.json(messages);
+        int id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message msg = mapper.readValue(ctx.body(), Message.class);
+        if( msg.getMessage_id() == 0 || msg.getMessage_text().length() == 0 || msg.getMessage_text().length()>255){
+            ctx.status(400);
+        }
+        Message newMessage= socialMediaService.updateMessageById(id,msg);
+        ctx.json(newMessage);
         ctx.status(200);
 
     }
 
     private void UserFeed(Context ctx){
-        ObjectMapper mapper = new ObjectMapper();
-        List<Message> messages = socialMediaService.getAllMessages();
+        int id = Integer.parseInt(ctx.pathParam("account_id"));
+        List<Message> messages = socialMediaService.getUserFeed(id);
         ctx.json(messages);
         ctx.status(200);
 

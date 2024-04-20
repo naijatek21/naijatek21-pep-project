@@ -31,7 +31,20 @@ public class SocialMediaService {
     public Account getUser(int id){
         return socialMediaDAO.getAccountById(id);
     }
+    public Message getMessage(int id){
+        return socialMediaDAO.getMessageById(id);
+    }
+    public Message deleteMessage(int id){
+        return socialMediaDAO.deleteMessage(id);
+    }
 
+    public Message updateMessageById(int id, Message message){
+        return socialMediaDAO.updateMessage(id,message);
+    }
+
+    public List<Message> getUserFeed(int id){
+        return socialMediaDAO.getMessagesByUser(id);
+    }
 
     public List<Account> getAllAccounts(){
         return socialMediaDAO.getAllAccounts();
