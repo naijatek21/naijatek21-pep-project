@@ -25,24 +25,12 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register",this::addNewUser);
         app.post("/login",this::logger);
-
-        app.get("/messages/{message_id}",
-        );
-
-        app.delete("/messages/{message_id}",
-        );
-
-        app.delete("/messages/{message_id}", ctx->{
-            int id = Integer.parseInt(ctx.pathParam("message_id"));
-            Message message = socialMediaService.deleteMessage(id);
-            ctx.json(message);
-            ctx.status(200);}
-        );
-
-
-        
-        
-        
+        app.post("/messages",this::messageGenerator);
+        app.get("/messages",this::messageFeed);
+        app.get("/messages/{message_id}",this::messageRetrieve);
+        app.delete("/messages/{message_id}",this::messageDelete);
+        app.patch("/messages/{message_id}",this::messageUpdate);
+        app.get("/accounts/{account_id}",this::UserFeed);
         app.start(8080);
 
         return app;
