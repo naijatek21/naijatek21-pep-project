@@ -46,19 +46,19 @@ public class SocialMediaDAO {
  
     }
 
-    public Message newMessage(Message msg, Account account ){
+    public Message newMessage(Message msg){
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "insert into message (message_text, posted_by, time_posted_epoc) values (?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1,msg.getMessage_text());            
-            preparedStatement.setInt(1,account.getAccount_id());
+            preparedStatement.setInt(1,msg.getPosted_by());
             preparedStatement.setLong(3, msg.getTime_posted_epoch());
             preparedStatement.executeUpdate();
             ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
             if(pkeyResultSet.next()){
                 int generated_message_id = (int) pkeyResultSet.getLong(1);
-                return new Message(generated_message_id, account.getAccount_id(), msg.getMessage_text(),msg.getTime_posted_epoch());
+                return new Message(generated_message_id, msg.getPosted_by(), msg.getMessage_text(),msg.getTime_posted_epoch());
             }
         } catch(SQLException e){
             System.out.println(e.getMessage());
@@ -86,6 +86,43 @@ public class SocialMediaDAO {
         return messages;
     }
 
+    public List<Account> getAllAccounts(){
+        Connection connection = ConnectionUtil.getConnection();
+        List<Account> accounts = new ArrayList<>();
+        try {
+            //Write SQL logic here
+            String sql = "select * from account";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Account account = new Account(rs.getInt("account_id"), rs.getString("username"),
+                rs.getString("password"));
+                accounts.add(account);
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return accounts;
+    }
+     public Account getAccountById(int id){
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "select * from account where account_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Account account = new Account(rs.getInt("account_id"), rs.getString("username"),
+                rs.getString("password"));
+                return account;
+            }
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+
+     }
 
     public Message getMessageById(int id){
         Connection connection = ConnectionUtil.getConnection();

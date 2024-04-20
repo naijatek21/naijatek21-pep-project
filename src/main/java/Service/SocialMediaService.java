@@ -6,6 +6,8 @@ import Util.ConnectionUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import DAO.SocialMediaDAO;
+import java.util.List;
+
 
 public class SocialMediaService {
     public SocialMediaDAO socialMediaDAO;
@@ -20,6 +22,20 @@ public class SocialMediaService {
     public List<Message> getAllMessages(){
         return socialMediaDAO.getAllMessages();
     }
-    
+    public Account addUser(Account accnt){
+        return socialMediaDAO.newAccount(accnt);
+    }
+    public Message addMessage(Message msg){
+        return socialMediaDAO.newMessage(msg);
+    }
+    public Account getUser(int id){
+        return socialMediaDAO.getAccountById(id);
+    }
+
+
+    public List<Account> getAllAccounts(){
+        return socialMediaDAO.getAllAccounts();
+    }
+
 
 }
