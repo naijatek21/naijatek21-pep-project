@@ -98,7 +98,6 @@ public class SocialMediaController {
     }
 
     private void messageFeed(Context ctx) throws JsonProcessingException{
-        ObjectMapper mapper = new ObjectMapper();
         List<Message> messages = socialMediaService.getAllMessages();
         ctx.json(messages);
         ctx.status(200);
