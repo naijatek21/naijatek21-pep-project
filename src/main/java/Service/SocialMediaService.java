@@ -18,7 +18,9 @@ public class SocialMediaService {
     public SocialMediaService(SocialMediaDAO socialMediaDAO){
         this.socialMediaDAO = socialMediaDAO; 
     }
-
+    public Account accountVerify(String username,String password){
+        return socialMediaDAO.findAccount(username, password);
+    }
     public List<Message> getAllMessages(){
         return socialMediaDAO.getAllMessages();
     }

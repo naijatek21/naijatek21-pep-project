@@ -21,6 +21,9 @@ public class SocialMediaController {
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
     SocialMediaService socialMediaService;
+    public SocialMediaController(){
+        socialMediaService = new SocialMediaService();
+    }
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.post("/register",this::addNewUser);
@@ -31,8 +34,6 @@ public class SocialMediaController {
         app.delete("/messages/{message_id}",this::messageDelete);
         app.patch("/messages/{message_id}",this::messageUpdate);
         app.get("/accounts/{account_id}",this::UserFeed);
-        app.start(8080);
-
         return app;
     }
 
@@ -45,7 +46,7 @@ public class SocialMediaController {
         Account account = mapper.readValue(ctx.body(), Account.class);
         List <Account> accounts = socialMediaService.getAllAccounts();
         for(Account accnt : accounts){
-            if(accnt.getAccount_id() ==account.getAccount_id() ){
+            if(accnt.getPassword() ==account.getPassword() && account.getUsername() == accnt.getUsername()){
                 ctx.status(400);
             }
         }
@@ -59,12 +60,10 @@ public class SocialMediaController {
     private void logger(Context ctx)  throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
-        List <Account> accounts = socialMediaService.getAllAccounts();
-        for(Account accnt : accounts){
-            if(accnt.getPassword() == account.getPassword() && accnt.getUsername()==account.getUsername()){
-                ctx.json(accnt);
-                ctx.status(200);
-            }
+        Account res = socialMediaService.accountVerify(account.getUsername(), account.getPassword());
+        if( res != null){
+            ctx.json(res, Account.class);
+            ctx.status(200);
         }
         ctx.status(401);
 
@@ -95,14 +94,16 @@ public class SocialMediaController {
     private void messageRetrieve(Context ctx){
         int id =Integer.parseInt(ctx.pathParam("message_id"));
             Message message = socialMediaService.getMessage(id);
-            ctx.json(message);
+            if(message !=null)
+                ctx.json(message);
             ctx.status(200);
     }
     
     private void messageDelete(Context ctx){
         int id = Integer.parseInt(ctx.pathParam("message_id"));
             Message message = socialMediaService.deleteMessage(id);
-            ctx.json(message);
+            if(message != null)
+                ctx.json(message);
             ctx.status(200);
     }
 
